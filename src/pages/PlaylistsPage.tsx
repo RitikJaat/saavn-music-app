@@ -6,40 +6,40 @@ import { Playlist } from '../types';
 // Sample playlists data with updated structure to match API
 const samplePlaylists: Playlist[] = [
   {
-    id: 'playlist1',
-    name: 'Top Hits 2023',
-    title: 'Top Hits 2023',
-    description: 'The most popular songs right now',
+    id: 'playlist/2676373',
+    name: 'Top 50 - Global',
+    title: 'Top 50 - Global',
+    description: 'The most popular songs worldwide right now',
     image: '/playlist-images/top-hits.jpg',
     songs: 50,
-    followers: '2.5M'
+    followers: '3.2M'
   },
   {
-    id: 'playlist2',
-    name: 'Chill Vibes',
-    title: 'Chill Vibes',
-    description: 'Relaxing tunes to unwind',
+    id: 'playlist/100738310',
+    name: 'Chill Lofi Beats',
+    title: 'Chill Lofi Beats',
+    description: 'Relaxing lofi tunes to study and unwind',
     image: '/playlist-images/chill-vibes.jpg',
-    songs: 40,
-    followers: '1.2M'
+    songs: 42,
+    followers: '1.8M'
+  },
+  {
+    id: 'playlist/4144832',
+    name: 'Bollywood Hits',
+    title: 'Bollywood Hits',
+    description: 'Top Bollywood tracks everyone loves',
+    image: '/playlist-images/workout.jpg',
+    songs: 45,
+    followers: '2.1M'
   },
   {
     id: 'playlist3',
     name: 'Workout Motivation',
     title: 'Workout Motivation',
     description: 'Power through your workout with these energetic tracks',
-    image: '/playlist-images/workout.jpg',
-    songs: 45,
-    followers: '980K'
-  },
-  {
-    id: 'playlist4',
-    name: 'Acoustic Covers',
-    title: 'Acoustic Covers',
-    description: 'Beautiful acoustic versions of your favorite songs',
     image: '/playlist-images/acoustic.jpg',
-    songs: 30,
-    followers: '750K'
+    songs: 38,
+    followers: '980K'
   }
 ];
 

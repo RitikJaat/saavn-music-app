@@ -143,9 +143,11 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     isAutoPlayingRef.current = false;
     
     if (queue.length > 0) {
-      const nextSong = queue[0];
-      const newQueue = queue.slice(1);
-      setQueue(newQueue);
+      // Find the next song but don't remove from queue
+      const nextSongIndex = 0;
+      const nextSong = queue[nextSongIndex];
+      
+      // Play the next song without modifying the queue
       playSong(nextSong);
     } else if (wasAutoPlaying) {
       // If auto-playing reached the end of queue, reset everything
@@ -153,7 +155,6 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setCurrentSong(null);
       setIsPlaying(false);
       setCurrentTime(0);
-      // Title is now updated in useEffect, no need to do it here
     }
   };
 

@@ -14,22 +14,31 @@ import { Link } from 'react-router-dom';
 // Sample playlists as fallback if API fails
 const samplePlaylists: Playlist[] = [
   {
-    id: 'playlist1',
-    title: 'Top Hits',
-    name: 'Top Hits',
-    description: 'The most popular songs right now',
+    id: 'playlist/2676373',
+    title: 'Top 50 - Global',
+    name: 'Top 50 - Global',
+    description: 'The most popular songs worldwide right now',
     image: '/playlist-images/top-hits.jpg',
     songs: 50,
-    followers: '2.5M'
+    followers: '3.2M'
   },
   {
-    id: 'playlist2',
-    title: 'Chill Vibes',
-    name: 'Chill Vibes',
-    description: 'Relaxing tunes to unwind',
+    id: 'playlist/100738310',
+    title: 'Chill Lofi Beats',
+    name: 'Chill Lofi Beats',
+    description: 'Relaxing lofi tunes to study and unwind',
     image: '/playlist-images/chill-vibes.jpg',
-    songs: 40,
-    followers: '1.2M'
+    songs: 42,
+    followers: '1.8M'
+  },
+  {
+    id: 'playlist/4144832',
+    title: 'Bollywood Hits',
+    name: 'Bollywood Hits',
+    description: 'Top Bollywood tracks everyone loves',
+    image: '/playlist-images/workout.jpg',
+    songs: 45,
+    followers: '2.1M'
   },
   {
     id: 'playlist3',
@@ -37,7 +46,7 @@ const samplePlaylists: Playlist[] = [
     name: 'Workout Motivation',
     description: 'Energetic tracks for your workout',
     image: '/playlist-images/workout.jpg',
-    songs: 45,
+    songs: 38,
     followers: '980K'
   }
 ];
@@ -266,7 +275,7 @@ const SearchPage: React.FC = () => {
                             alt={playlist.title || playlist.name || ''} 
                             className="w-full aspect-square object-cover"
                             onError={(e) => {
-                              e.currentTarget.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAABZ0RVh0Q3JlYXRpb24gVGltZQAwMS8wOC8xMOr+6FIAAAPsSURBVHic7dyxjsIwFABBfOL/f9lXXIu2cC44ZqYGWysW2bFsN8MwjAFc2j79B8AnEwhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUA=';
+                              e.currentTarget.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAABZ0RVh0Q3JlYXRpb24gVGltZQAwMS8wOC8xMOr+6FIAAAPsSURBVHic7dyxjsIwFABBfOL/f9lXXIu2cC44ZqYGWysW2bFsN8MwjAFc2j79B8AnEwhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUA=';
                             }}
                           />
                           {/* Gradient overlay for better text readability */}

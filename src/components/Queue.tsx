@@ -33,7 +33,7 @@ const Queue: React.FC<QueueProps> = ({ className }) => {
   };
 
   return (
-    <div className={`bg-gray-800/50 rounded-lg overflow-y-auto ${className}`}>
+    <div className={`bg-gray-800/50 rounded-lg overflow-y-auto scrollbar-hide ${className}`}>
       <div className="sticky top-0 bg-gray-800/90 p-3 border-b border-gray-700 flex justify-between items-center">
         <p className="text-gray-400 text-xs">{queue.length} songs in queue</p>
         {queue.length > 0 && (
@@ -49,9 +49,9 @@ const Queue: React.FC<QueueProps> = ({ className }) => {
         {currentSong && (
         <div className="p-2 border-b border-gray-700">
           <h3 className="text-xs font-semibold text-gray-300 px-2 mb-1">Now Playing</h3>
-            <div className="flex items-center p-2 hover:bg-white hover:bg-opacity-5 rounded-md">
+            <div className="flex items-center p-2 bg-purple-500/10 hover:bg-white hover:bg-opacity-5 rounded-md">
               <div 
-              className="w-6 h-6 mr-2 flex-shrink-0 cursor-pointer bg-gray-700 rounded-full flex items-center justify-center"
+              className="w-6 h-6 mr-2 flex-shrink-0 cursor-pointer bg-purple-500 rounded-full flex items-center justify-center"
                 onClick={() => {
                   if (isPlaying) {
                     pauseSong();
@@ -62,9 +62,9 @@ const Queue: React.FC<QueueProps> = ({ className }) => {
               >
                 {isPlaying ? (
                 <div className="flex space-x-0.5 h-3 items-end justify-center">
-                  <div className="w-0.5 bg-purple-400 h-2 animate-pulse"></div>
-                  <div className="w-0.5 bg-purple-400 h-3 animate-pulse"></div>
-                  <div className="w-0.5 bg-purple-400 h-1.5 animate-pulse"></div>
+                  <div className="w-0.5 bg-white h-2 animate-pulse"></div>
+                  <div className="w-0.5 bg-white h-3 animate-pulse"></div>
+                  <div className="w-0.5 bg-white h-1.5 animate-pulse"></div>
                   </div>
                 ) : (
                 <FaPlay className="text-white" size={10} />
@@ -96,15 +96,12 @@ const Queue: React.FC<QueueProps> = ({ className }) => {
             {queue.map((song, index) => (
               <div 
                 key={`${song.id}-${index}`}
-              className="flex items-center p-2 hover:bg-white hover:bg-opacity-5"
+                className={`flex items-center p-2 hover:bg-white hover:bg-opacity-5 ${currentSong?.id === song.id ? 'bg-purple-500/10' : ''}`}
               >
-              <div className="w-6 text-center text-gray-400 mr-2 text-xs bg-gray-700/50 rounded-full h-6 flex items-center justify-center">
-                  {index + 1}
-                </div>
                 <img 
                 src={song.image ? getBestImageUrl(song.image) : 'https://via.placeholder.com/40?text=No+Image'} 
                 alt={song.name || song.title || ''} 
-                className="w-10 h-10 rounded object-cover mr-2 cursor-pointer"
+                className="w-10 h-10 rounded object-cover ml-2 mr-2 cursor-pointer"
                   onClick={() => handlePlaySong(song)}
                   onError={(e) => {
                   e.currentTarget.src = 'https://via.placeholder.com/40?text=Error';
