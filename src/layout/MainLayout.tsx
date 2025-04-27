@@ -44,6 +44,11 @@ const MainLayout: React.FC = () => {
         <Outlet />
       </div>
       
+      {/* Footer - Made by Ritik */}
+      <div className="fixed bottom-20 left-0 right-0 z-10 text-center py-2 bg-black/30 backdrop-blur-sm">
+        <p className="text-gray-300 text-sm font-medium">Made with ❤️ by Ritik</p>
+      </div>
+      
       {/* Music Player at bottom */}
       <MusicPlayer />
     </div>

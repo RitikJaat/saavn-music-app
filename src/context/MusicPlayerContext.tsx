@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { Song } from '../types';
+import { decodeHtmlEntities } from '../utils/helpers';
 
 interface MusicPlayerContextType {
   currentSong: Song | null;
@@ -121,6 +122,8 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     soundRef.current.play();
     setCurrentSong(song);
+    
+    // Title is now updated in useEffect, no need to do it here
   };
 
   const pauseSong = () => {
@@ -150,6 +153,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setCurrentSong(null);
       setIsPlaying(false);
       setCurrentTime(0);
+      // Title is now updated in useEffect, no need to do it here
     }
   };
 
@@ -222,6 +226,17 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       cleanupSound();
     };
   }, []);
+
+  // Set initial page title and handle title updates when currentSong changes
+  useEffect(() => {
+    if (currentSong) {
+      const songName = decodeHtmlEntities(currentSong.name);
+      const artistName = decodeHtmlEntities(currentSong.primaryArtists);
+      document.title = `${songName} - ${artistName} | Saavn Music App`;
+    } else {
+      document.title = 'Saavn Music App';
+    }
+  }, [currentSong]);
 
   const value = {
     currentSong,
