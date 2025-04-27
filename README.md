@@ -84,5 +84,5 @@ MIT
 
 ## Acknowledgments
 
-- Inspired by JioSaavn's interface
+- Credits to [Sumit Kolhe](https://github.com/sumitkolhe) for the API
 - Created with Create React App
