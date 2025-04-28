@@ -20,7 +20,8 @@ const AlbumPage: React.FC = () => {
     playSong,
     pauseSong,
     resumeSong,
-    addToQueue
+    addToQueue,
+    addMultipleToQueue
   } = useMusicPlayer();
 
   useEffect(() => {
@@ -52,13 +53,20 @@ const AlbumPage: React.FC = () => {
 
   const playAllSongs = () => {
     if (songs.length > 0) {
-      // Play the first song
-      playSong(songs[0]);
+      console.log('Playing all songs from album');
+      // Take the first song to play immediately
+      const firstSong = songs[0];
+      // Get remaining songs for the queue
+      const remainingSongs = songs.slice(1);
       
-      // Add rest to queue
-      songs.slice(1).forEach(song => {
-        addToQueue(song);
-      });
+      // Play the first song
+      playSong(firstSong);
+      
+      // Add the rest to queue
+      if (remainingSongs.length > 0) {
+        console.log(`Adding ${remainingSongs.length} songs to queue from album`);
+        addMultipleToQueue(remainingSongs);
+      }
     }
   };
 

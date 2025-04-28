@@ -16,7 +16,8 @@ const TrendingPage: React.FC = () => {
     playSong,
     pauseSong,
     resumeSong,
-    addToQueue
+    addToQueue,
+    addMultipleToQueue
   } = useMusicPlayer();
 
   useEffect(() => {
@@ -39,13 +40,20 @@ const TrendingPage: React.FC = () => {
 
   const playAllSongs = () => {
     if (trendingSongs.length > 0) {
-      // Play the first song
-      playSong(trendingSongs[0]);
+      console.log('Playing all trending songs');
+      // Take the first song to play immediately
+      const firstSong = trendingSongs[0];
+      // Get remaining songs for the queue
+      const remainingSongs = trendingSongs.slice(1);
       
-      // Add rest to queue
-      trendingSongs.slice(1).forEach(song => {
-        addToQueue(song);
-      });
+      // Play the first song
+      playSong(firstSong);
+      
+      // Add the rest to queue
+      if (remainingSongs.length > 0) {
+        console.log(`Adding ${remainingSongs.length} songs to queue from trending`);
+        addMultipleToQueue(remainingSongs);
+      }
     }
   };
 

@@ -64,6 +64,7 @@ const PlaylistPage: React.FC = () => {
       
       // Add remaining songs to queue
       if (remainingSongs.length > 0) {
+        console.log(`Adding ${remainingSongs.length} songs to queue from playlist`);
         addMultipleToQueue(remainingSongs);
         
         // Show a notification about added songs
@@ -155,22 +156,45 @@ const PlaylistPage: React.FC = () => {
               </span>
               <span>{playlist.followers ? `${playlist.followers} followers` : ''}</span>
             </div>
-            <button
-              onClick={togglePlaylistPlay}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium flex items-center justify-center hover:opacity-90 transition-all"
-            >
-              {isPlaylistPlaying ? (
-                <>
-                  <FaPause className="mr-2" />
-                  Pause
-                </>
-              ) : (
-                <>
-                  <FaPlay className="mr-2" />
-                  Play All
-                </>
-              )}
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={togglePlaylistPlay}
+                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium flex items-center justify-center hover:opacity-90 transition-all"
+              >
+                {isPlaylistPlaying ? (
+                  <>
+                    <FaPause className="mr-2" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <FaPlay className="mr-2" />
+                    Play All
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  addMultipleToQueue(songs);
+                  // Show notification
+                  const message = document.createElement('div');
+                  message.className = 'fixed bottom-24 right-4 glass-dark px-4 py-3 rounded-lg text-white text-sm z-50';
+                  message.textContent = `Added ${songs.length} songs to queue`;
+                  document.body.appendChild(message);
+                  
+                  // Remove message after 3 seconds
+                  setTimeout(() => {
+                    if (document.body.contains(message)) {
+                      document.body.removeChild(message);
+                    }
+                  }, 3000);
+                }}
+                className="flex-1 bg-purple-600/50 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-medium flex items-center justify-center hover:opacity-90 transition-all"
+              >
+                <FaMusic className="mr-2" />
+                Add to Queue
+              </button>
+            </div>
           </div>
         </div>
         

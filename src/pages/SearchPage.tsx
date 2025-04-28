@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { searchSongs, searchAlbums, searchArtists, searchPlaylists } from '../services/api';
+import { searchSongs, searchAlbums, searchArtists, searchPlaylists, getPlaylistSongs } from '../services/api';
 import { Song, Album, Artist, Playlist } from '../types';
 import SearchBar from '../components/SearchBar';
 import SongCard from '../components/SongCard';
@@ -68,7 +68,9 @@ const SearchPage: React.FC = () => {
     playSong,
     pauseSong,
     resumeSong,
-    addToQueue
+    addToQueue,
+    addMultipleToQueue,
+    clearQueue
   } = useMusicPlayer();
 
   useEffect(() => {
@@ -123,13 +125,15 @@ const SearchPage: React.FC = () => {
 
   const playAllSongs = () => {
     if (songResults.length > 0) {
+      console.log('Playing all songs from search results');
+      // Clear existing queue
+      clearQueue();
+      
+      // Add all songs to queue
+      addMultipleToQueue(songResults);
+      
       // Play the first song
       playSong(songResults[0]);
-      
-      // Add rest to queue
-      songResults.slice(1, 10).forEach(song => {
-        addToQueue(song);
-      });
     }
   };
 
@@ -216,22 +220,26 @@ const SearchPage: React.FC = () => {
               </div>
 
               {activeTab === 'songs' && songResults.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-6 flex space-x-4">
                   <button
-                    onClick={toggleSearchPlay}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium flex items-center hover:opacity-90 transition-all mb-6"
+                    onClick={() => {
+                      clearQueue();
+                      addMultipleToQueue(songResults);
+                      playSong(songResults[0]);
+                    }}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium flex items-center hover:opacity-90 transition-all"
                   >
-                    {isSearchSongPlaying ? (
-                      <>
-                        <FaPause className="mr-2" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <FaPlay className="mr-2" />
-                        Play All
-                      </>
-                    )}
+                    <FaPlay className="mr-2" />
+                    Play All
+                  </button>
+                  <button
+                    onClick={() => {
+                      addMultipleToQueue(songResults);
+                    }}
+                    className="bg-purple-600/50 hover:bg-purple-700 text-white px-6 py-3 rounded-full font-medium flex items-center hover:opacity-90 transition-all"
+                  >
+                    <FaMusic className="mr-2" />
+                    Add to Queue
                   </button>
                 </div>
               )}
@@ -275,7 +283,7 @@ const SearchPage: React.FC = () => {
                             alt={playlist.title || playlist.name || ''} 
                             className="w-full aspect-square object-cover"
                             onError={(e) => {
-                              e.currentTarget.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAABZ0RVh0Q3JlYXRpb24gVGltZQAwMS8wOC8xMOr+6FIAAAPsSURBVHic7dyxjsIwFABBfOL/f9lXXIu2cC44ZqYGWysW2bFsN8MwjAFc2j79B8AnEwhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUAUCESBQBQIRIFAFAhEgUA=';
+                              e.currentTarget.src = '/default-playlist.png';
                             }}
                           />
                           {/* Gradient overlay for better text readability */}

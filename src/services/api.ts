@@ -179,94 +179,24 @@ export const getPlaylistDetails = async (id: string): Promise<any> => {
   }
 };
 
-export const getPlaylistSongs = async (id: string): Promise<Song[]> => {
+export const getPlaylistSongs = async (playlistId: string): Promise<Song[]> => {
   try {
-    // First request to get initial songs and details
-    const initialResponse = await api.get(`/playlists`, {
-      params: { id }
+    // First try to get playlist details which includes songs
+    const response = await api.get(`/playlists`, {
+      params: { id: playlistId }
     });
     
-    // Check if we got valid data
-    if (!initialResponse.data.data) {
-      console.error("Invalid playlist data received");
-      return [];
+    if (response.data?.data?.songs && Array.isArray(response.data.data.songs)) {
+      return response.data.data.songs;
     }
     
-    // Get songs from initial response
-    const initialSongs = initialResponse.data.data.songs || [];
-    console.log(`Initial songs loaded: ${initialSongs.length}`);
-    
-    // Get total song count - some APIs use songCount, others might use count or total
-    const totalSongs = 
-      initialResponse.data.data.songCount || 
-      initialResponse.data.data.count || 
-      initialResponse.data.data.total || 
-      initialSongs.length;
-    
-    console.log(`Total songs in playlist according to API: ${totalSongs}`);
-    
-    // If we have all songs or no songs, return what we have
-    if (initialSongs.length >= totalSongs || initialSongs.length === 0) {
-      return initialSongs;
-    }
-    
-    // If we need to fetch more songs, try a different approach
-    // Some APIs require a different endpoint for paginated songs
-    try {
-      const fullResponse = await api.get(`/playlists/${id}/songs`, {
-        params: { 
-          limit: 100  // Try a larger limit
-        }
-      });
-      
-      if (fullResponse.data.data && Array.isArray(fullResponse.data.data.songs)) {
-        const allSongs = fullResponse.data.data.songs;
-        console.log(`Fetched ${allSongs.length} songs using dedicated endpoint`);
-        return allSongs;
-      }
-    } catch (paginationError) {
-      console.log("Dedicated songs endpoint failed, falling back to manual pagination");
-    }
-    
-    // Manual pagination as fallback
-    let allSongs = [...initialSongs];
-    let page = 2;
-    let hasMoreSongs = true;
-    
-    // Keep fetching until we have all songs or hit an error
-    while (hasMoreSongs && allSongs.length < totalSongs) {
-      try {
-        const response = await api.get(`/playlists`, {
-          params: { 
-            id,
-            page
-          }
-        });
-        
-        const pageSongs = response.data.data.songs || [];
-        console.log(`Page ${page} songs: ${pageSongs.length}`);
-        
-        if (pageSongs.length === 0) {
-          // No more songs to fetch
-          hasMoreSongs = false;
-        } else {
-          // Add songs to our collection
-          allSongs = [...allSongs, ...pageSongs];
-          page++;
-        }
-      } catch (error) {
-        console.error(`Error fetching page ${page} of songs:`, error);
-        hasMoreSongs = false;
-      }
-    }
-    
-    console.log(`Total songs loaded: ${allSongs.length}`);
-    return allSongs;
+    // If no songs in the first response, try the JioSaavn method
+    return getJioSaavnPlaylistSongs(playlistId);
   } catch (error) {
-    console.error('Error getting playlist songs:', error);
+    console.error('Error fetching playlist songs:', error);
     return [];
   }
-}; 
+};
 
 // Try direct JioSaavn playlist endpoint for all songs
 export const getJioSaavnPlaylistSongs = async (id: string): Promise<Song[]> => {

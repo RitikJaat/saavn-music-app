@@ -37,8 +37,8 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const soundRef = useRef<Howl | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Flag to prevent multiple songs from playing at once
-  const isTransitioningRef = useRef<boolean>(false);
+  // This will help us handle the end of a song reliably
+  const songEndHandled = useRef<boolean>(false);
 
   const cleanupSound = () => {
     if (soundRef.current) {
@@ -66,62 +66,80 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const playSong = (song: Song) => {
+    console.log("Playing song:", song.name);
+    
+    // Clean up previous sound instance
     cleanupSound();
+    
+    // Reset the end handling flag
+    songEndHandled.current = false;
     
     // Add current song to history if exists
     if (currentSong) {
       setQueueHistory(prev => [currentSong, ...prev.slice(0, 19)]); // Keep last 20 songs
     }
     
+    // Update the current song immediately
+    setCurrentSong(song);
+    
     // Check if downloadUrl exists and has length
     if (!song.downloadUrl || song.downloadUrl.length === 0) {
       console.error('Song has no download URLs', song);
-      // Try to play next song if this one fails
-      if (queue.length > 0) {
-        const nextSong = queue[0];
-        setQueue(prev => prev.slice(1));
-        playSong(nextSong);
-      }
+      
+      // Try to play the next song
+      setTimeout(() => {
+        if (queue.length > 0) {
+          const nextUpSong = queue[0];
+          setQueue(prev => prev.slice(1));
+          playSong(nextUpSong);
+        }
+      }, 100);
+      
       return;
     }
     
     // Use highest quality URL
     const url = song.downloadUrl[song.downloadUrl.length - 1].url;
     
+    // Create the sound instance
     soundRef.current = new Howl({
       src: [url],
       html5: true,
       volume: volume,
+      autoplay: true,
       onplay: () => {
+        console.log('Song started playing:', song.name);
         setIsPlaying(true);
         startTimer();
       },
       onend: () => {
-        console.log('Song ended, playing next...');
-        // We use setTimeout to ensure state updates have completed
-        // before we try to reference the queue
+        console.log('Song ended:', song.name);
+        
+        // Prevent duplicate handling of song end
+        if (songEndHandled.current) {
+          console.log('Song end already handled, skipping');
+          return;
+        }
+        
+        songEndHandled.current = true;
+        
+        // Schedule the next song after a small delay to ensure state updates
         setTimeout(() => {
-          if (!isTransitioningRef.current && queue.length > 0) {
-            isTransitioningRef.current = true;
-            const nextSongToPlay = queue[0];
-            console.log('Playing next song:', nextSongToPlay.name);
+          console.log('Queue length at song end:', queue.length);
+          if (queue.length > 0) {
+            // Get the next song
+            const nextSong = queue[0];
+            // Remove it from the queue
             setQueue(prev => prev.slice(1));
-            
-            // Reset the transitioning flag after a short delay
-            setTimeout(() => {
-              isTransitioningRef.current = false;
-            }, 500);
-            
-            playSong(nextSongToPlay);
+            // Play it
+            playSong(nextSong);
           } else {
-            // Keep the current song visible but mark it as paused
+            console.log('No more songs in queue');
+            // If no more songs in queue, reset but keep the current song info
             setIsPlaying(false);
             setCurrentTime(0);
-            if (soundRef.current) {
-              soundRef.current.stop();
-            }
           }
-        }, 100);
+        }, 200);
       },
       onload: () => {
         setDuration(soundRef.current?.duration() || 0);
@@ -132,23 +150,26 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       onstop: () => {
         setIsPlaying(false);
       },
-      onloaderror: () => {
-        console.error('Error loading song', song);
-        // Auto skip to next song on error
-        if (queue.length > 0) {
-          const nextSong = queue[0];
-          setQueue(prev => prev.slice(1));
-          playSong(nextSong);
-        }
+      onloaderror: (id, error) => {
+        console.error('Error loading song:', song.name, error);
+        songEndHandled.current = true;
+        
+        // Try to play the next song on error
+        setTimeout(() => {
+          if (queue.length > 0) {
+            const nextSong = queue[0];
+            setQueue(prev => prev.slice(1));
+            playSong(nextSong);
+          }
+        }, 100);
       },
     });
-
-    soundRef.current.play();
-    setCurrentSong(song);
   };
 
   const pauseSong = () => {
-    soundRef.current?.pause();
+    if (soundRef.current) {
+      soundRef.current.pause();
+    }
     setIsPlaying(false);
   };
 
@@ -160,25 +181,17 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const nextSong = () => {
-    if (isTransitioningRef.current) return;
-    
     if (queue.length > 0) {
-      isTransitioningRef.current = true;
-      const nextSongToPlay = queue[0];
+      // Get the next song from the queue
+      const nextUpSong = queue[0];
+      // Remove it from the queue
       setQueue(prev => prev.slice(1));
-      
-      // Reset the flag after a short delay
-      setTimeout(() => {
-        isTransitioningRef.current = false;
-      }, 500);
-      
-      playSong(nextSongToPlay);
-    } else {
-      // If no more songs in queue, just restart current song
-      if (currentSong && soundRef.current) {
-        soundRef.current.stop();
-        soundRef.current.play();
-      }
+      // Play it
+      playSong(nextUpSong);
+    } else if (currentSong && soundRef.current) {
+      // If no more songs, just restart the current song
+      soundRef.current.stop();
+      soundRef.current.play();
     }
   };
 
@@ -219,18 +232,26 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const addToQueue = (song: Song) => {
+    console.log('Adding to queue:', song.name);
     setQueue(prevQueue => [...prevQueue, song]);
   };
   
   const addMultipleToQueue = (songs: Song[]) => {
     if (songs.length === 0) return;
     
+    console.log(`Adding ${songs.length} songs to queue`);
     setQueue(prevQueue => [...prevQueue, ...songs]);
     
     // If nothing is playing, start playing the first song
     if (!currentSong && songs.length > 0) {
-      playSong(songs[0]);
-      setQueue(prevQueue => (songs.length > 1 ? [...prevQueue.slice(1)] : prevQueue));
+      const firstSong = songs[0];
+      const remainingSongs = songs.slice(1);
+      
+      // Play the first song
+      playSong(firstSong);
+      
+      // Update the queue to have the remaining songs
+      setQueue(remainingSongs);
     }
   };
 
@@ -243,16 +264,18 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const clearQueue = () => {
+    console.log('Clearing queue');
     setQueue([]);
   };
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       cleanupSound();
     };
   }, []);
 
-  // Set initial page title and handle title updates when currentSong changes
+  // Set page title when song changes
   useEffect(() => {
     if (currentSong) {
       const songName = decodeHtmlEntities(currentSong.name);

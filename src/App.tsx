@@ -13,11 +13,10 @@ import ArtistPage from './pages/ArtistPage';
 import LibraryPage from './pages/LibraryPage';
 import TrendingPage from './pages/TrendingPage';
 import NewReleasesPage from './pages/NewReleasesPage';
-import PlaylistsPage from './pages/PlaylistsPage';
+import PlayerPage from './pages/PlayerPage';
 import PlaylistPage from './pages/PlaylistPage';
 import AlbumsPage from './pages/AlbumsPage';
 import ArtistsPage from './pages/ArtistsPage';
-import PlayerPage from './pages/PlayerPage';
 
 function App() {
   return (
@@ -37,7 +36,6 @@ function App() {
             <Route path="new-releases" element={<NewReleasesPage />} />
             
             {/* New routes */}
-            <Route path="playlists" element={<PlaylistsPage />} />
             <Route path="playlist/:id" element={<PlaylistPage />} />
             <Route path="albums" element={<AlbumsPage />} />
             <Route path="artists" element={<ArtistsPage />} />
