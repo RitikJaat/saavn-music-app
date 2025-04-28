@@ -39,96 +39,96 @@ const Queue: React.FC<QueueProps> = ({ className }) => {
         {queue.length > 0 && (
             <button 
               onClick={clearQueue}
-            className="text-gray-400 hover:text-white transition-colors text-xs bg-gray-700 px-2 py-1 rounded"
+              className="text-gray-400 hover:text-white transition-colors text-xs bg-gray-700 px-2 py-1 rounded"
             >
-            Clear
+              Clear
             </button>
         )}
-        </div>
+      </div>
 
-        {currentSong && (
+      {currentSong && (
         <div className="p-2 border-b border-gray-700">
           <h3 className="text-xs font-semibold text-gray-300 px-2 mb-1">Now Playing</h3>
-            <div className="flex items-center p-2 bg-purple-500/10 hover:bg-white hover:bg-opacity-5 rounded-md">
-              <div 
+          <div className="flex items-center p-2 bg-purple-500/10 hover:bg-white hover:bg-opacity-5 rounded-md">
+            <div 
               className="w-6 h-6 mr-2 flex-shrink-0 cursor-pointer bg-purple-500 rounded-full flex items-center justify-center"
-                onClick={() => {
-                  if (isPlaying) {
-                    pauseSong();
-                  } else {
-                    resumeSong();
-                  }
-                }}
-              >
-                {isPlaying ? (
+              onClick={() => {
+                if (isPlaying) {
+                  pauseSong();
+                } else {
+                  resumeSong();
+                }
+              }}
+            >
+              {isPlaying ? (
                 <div className="flex space-x-0.5 h-3 items-end justify-center">
                   <div className="w-0.5 bg-white h-2 animate-pulse"></div>
                   <div className="w-0.5 bg-white h-3 animate-pulse"></div>
                   <div className="w-0.5 bg-white h-1.5 animate-pulse"></div>
-                  </div>
-                ) : (
+                </div>
+              ) : (
                 <FaPlay className="text-white" size={10} />
-                )}
-              </div>
-              <img 
+              )}
+            </div>
+            <img 
               src={currentSong.image ? getBestImageUrl(currentSong.image) : 'https://via.placeholder.com/40?text=No+Image'} 
               alt={currentSong.name || currentSong.title || ''} 
               className="w-10 h-10 rounded mr-2"
-                onError={(e) => {
+              onError={(e) => {
                 e.currentTarget.src = 'https://via.placeholder.com/40?text=Error';
-                }}
-              />
-              <div className="flex-1 min-w-0">
+              }}
+            />
+            <div className="flex-1 min-w-0">
               <h4 className="text-white text-xs font-medium truncate">
-                  {decodeHtmlEntities(currentSong.name)}
-                </h4>
-                <p className="text-gray-400 text-xs truncate">
-                  {decodeHtmlEntities(currentSong.primaryArtists)}
-                </p>
-              </div>
+                {decodeHtmlEntities(currentSong.name)}
+              </h4>
+              <p className="text-gray-400 text-xs truncate">
+                {decodeHtmlEntities(currentSong.primaryArtists)}
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {queue.length > 0 ? (
+      {queue.length > 0 ? (
         <div className="divide-y divide-gray-700/50">
           <h3 className="text-xs font-semibold text-gray-300 p-2">Next Up</h3>
-            {queue.map((song, index) => (
-              <div 
-                key={`${song.id}-${index}`}
-                className={`flex items-center p-2 hover:bg-white hover:bg-opacity-5 ${currentSong?.id === song.id ? 'bg-purple-500/10' : ''}`}
-              >
-                <img 
+          {queue.map((song, index) => (
+            <div 
+              key={`${song.id}-${index}`}
+              className="flex items-center p-2 hover:bg-white hover:bg-opacity-5"
+            >
+              <img 
                 src={song.image ? getBestImageUrl(song.image) : 'https://via.placeholder.com/40?text=No+Image'} 
                 alt={song.name || song.title || ''} 
                 className="w-10 h-10 rounded object-cover ml-2 mr-2 cursor-pointer"
-                  onClick={() => handlePlaySong(song)}
-                  onError={(e) => {
+                onClick={() => handlePlaySong(song)}
+                onError={(e) => {
                   e.currentTarget.src = 'https://via.placeholder.com/40?text=Error';
-                  }}
-                />
-                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handlePlaySong(song)}>
+                }}
+              />
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handlePlaySong(song)}>
                 <h4 className="text-white text-xs font-medium truncate">
-                    {decodeHtmlEntities(song.name)}
-                  </h4>
-                  <p className="text-gray-400 text-xs truncate">
-                    {decodeHtmlEntities(song.primaryArtists)}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => removeFromQueue(index)}
-                className="text-gray-500 hover:text-white p-1 bg-gray-700/50 rounded-full"
-                >
-                <FaTimes size={10} />
-                </button>
+                  {decodeHtmlEntities(song.name)}
+                </h4>
+                <p className="text-gray-400 text-xs truncate">
+                  {decodeHtmlEntities(song.primaryArtists)}
+                </p>
               </div>
-            ))}
-          </div>
-        ) : (
+              <button 
+                onClick={() => removeFromQueue(index)}
+                className="text-gray-500 hover:text-white p-1 bg-gray-700/50 rounded-full"
+              >
+                <FaTimes size={10} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
         <div className="p-4 text-center text-gray-400 text-sm">
           Your queue is empty. Add songs to start playing.
-          </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };

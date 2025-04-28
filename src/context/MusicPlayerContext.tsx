@@ -37,8 +37,8 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const soundRef = useRef<Howl | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Keep track if we're manually skipping or song ended naturally
-  const isAutoPlayingRef = useRef<boolean>(false);
+  // Flag to prevent multiple songs from playing at once
+  const isTransitioningRef = useRef<boolean>(false);
 
   const cleanupSound = () => {
     if (soundRef.current) {
@@ -79,7 +79,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Try to play next song if this one fails
       if (queue.length > 0) {
         const nextSong = queue[0];
-        setQueue(queue.slice(1));
+        setQueue(prev => prev.slice(1));
         playSong(nextSong);
       }
       return;
@@ -97,8 +97,31 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         startTimer();
       },
       onend: () => {
-        isAutoPlayingRef.current = true;
-        nextSong();
+        console.log('Song ended, playing next...');
+        // We use setTimeout to ensure state updates have completed
+        // before we try to reference the queue
+        setTimeout(() => {
+          if (!isTransitioningRef.current && queue.length > 0) {
+            isTransitioningRef.current = true;
+            const nextSongToPlay = queue[0];
+            console.log('Playing next song:', nextSongToPlay.name);
+            setQueue(prev => prev.slice(1));
+            
+            // Reset the transitioning flag after a short delay
+            setTimeout(() => {
+              isTransitioningRef.current = false;
+            }, 500);
+            
+            playSong(nextSongToPlay);
+          } else {
+            // Keep the current song visible but mark it as paused
+            setIsPlaying(false);
+            setCurrentTime(0);
+            if (soundRef.current) {
+              soundRef.current.stop();
+            }
+          }
+        }, 100);
       },
       onload: () => {
         setDuration(soundRef.current?.duration() || 0);
@@ -114,7 +137,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Auto skip to next song on error
         if (queue.length > 0) {
           const nextSong = queue[0];
-          setQueue(queue.slice(1));
+          setQueue(prev => prev.slice(1));
           playSong(nextSong);
         }
       },
@@ -122,8 +145,6 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     soundRef.current.play();
     setCurrentSong(song);
-    
-    // Title is now updated in useEffect, no need to do it here
   };
 
   const pauseSong = () => {
@@ -139,22 +160,25 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const nextSong = () => {
-    const wasAutoPlaying = isAutoPlayingRef.current;
-    isAutoPlayingRef.current = false;
+    if (isTransitioningRef.current) return;
     
     if (queue.length > 0) {
-      // Find the next song but don't remove from queue
-      const nextSongIndex = 0;
-      const nextSong = queue[nextSongIndex];
+      isTransitioningRef.current = true;
+      const nextSongToPlay = queue[0];
+      setQueue(prev => prev.slice(1));
       
-      // Play the next song without modifying the queue
-      playSong(nextSong);
-    } else if (wasAutoPlaying) {
-      // If auto-playing reached the end of queue, reset everything
-      cleanupSound();
-      setCurrentSong(null);
-      setIsPlaying(false);
-      setCurrentTime(0);
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 500);
+      
+      playSong(nextSongToPlay);
+    } else {
+      // If no more songs in queue, just restart current song
+      if (currentSong && soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.play();
+      }
     }
   };
 
@@ -169,7 +193,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       
       // Add current song to the front of the queue
       if (currentSong) {
-        setQueue([currentSong, ...queue]);
+        setQueue(prev => [currentSong, ...prev]);
       }
       
       setQueueHistory(newHistory);
@@ -213,7 +237,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const removeFromQueue = (index: number) => {
     setQueue(prevQueue => {
       const newQueue = [...prevQueue];
-    newQueue.splice(index, 1);
+      newQueue.splice(index, 1);
       return newQueue;
     });
   };
